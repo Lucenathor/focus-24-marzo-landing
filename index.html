@@ -183,10 +183,21 @@
     .live-dot { width: 8px; height: 8px; background: #2fff1c; border-radius: 50%; animation: live-blink 1.5s ease-in-out infinite; }
     @keyframes live-blink { 0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(47, 255, 28, 0.6); } 50% { opacity: 0.4; box-shadow: 0 0 2px rgba(47, 255, 28, 0.2); } }
 
-    /* ===== SCROLL ARROW ===== */
-    .scroll-arrow { display: flex; justify-content: center; padding: 10px 0 0; animation: arrow-bounce 1.5s ease-in-out infinite; }
-    .scroll-arrow svg { width: 28px; height: 28px; fill: rgba(255,255,255,0.25); }
-    @keyframes arrow-bounce { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(8px); opacity: 0.9; } }
+    /* ===== SCROLL INDICATOR ===== */
+    .scroll-indicator { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 20px 28px; cursor: pointer; position: relative; }
+    .scroll-indicator-text { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.15em; animation: scroll-text-pulse 2s ease-in-out infinite; }
+    @keyframes scroll-text-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; color: rgba(0, 136, 255, 0.9); } }
+    .scroll-arrows-container { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .scroll-chevron { width: 30px; height: 16px; opacity: 0; animation: chevron-cascade 2s ease-in-out infinite; }
+    .scroll-chevron path { stroke: rgba(0, 136, 255, 0.8); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .scroll-chevron:nth-child(1) { animation-delay: 0s; }
+    .scroll-chevron:nth-child(2) { animation-delay: 0.15s; margin-top: -6px; }
+    .scroll-chevron:nth-child(3) { animation-delay: 0.3s; margin-top: -6px; }
+    @keyframes chevron-cascade { 0% { opacity: 0; transform: translateY(-6px); } 30%, 60% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(6px); } }
+    .scroll-indicator-line { width: 2px; height: 30px; background: linear-gradient(to bottom, rgba(0,136,255,0.6), transparent); animation: line-grow 2s ease-in-out infinite; }
+    @keyframes line-grow { 0%, 100% { height: 10px; opacity: 0.3; } 50% { height: 30px; opacity: 0.8; } }
+    .scroll-peek { position: relative; width: 100%; max-width: 500px; margin: 0 auto; padding: 0 20px; }
+    .scroll-peek-text { font-family: 'Poppins', sans-serif; font-size: 15px; color: rgba(255,255,255,0.5); text-align: center; mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); line-height: 1.5; }
 
     /* ===== URGENCY BADGE ===== */
     .urgency-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 50, 50, 0.1); border: 1px solid rgba(255, 50, 50, 0.3); border-radius: 30px; padding: 6px 18px; font-size: 12px; font-weight: 600; color: #ff6b6b; margin-bottom: 8px; animation: urgency-pulse 2s ease-in-out infinite; }
@@ -299,7 +310,7 @@
       .bonus-box p { font-size: 15px; }
       .ratings-section { gap: 20px; }
       .ticker-item { font-size: 11px; padding: 0 28px; }
-      .scroll-arrow svg { width: 22px; height: 22px; }
+      .scroll-indicator-text { font-size: 12px; }
       .countdown-number { font-size: 24px; padding: 6px 10px; min-width: 48px; }
       .countdown-separator { font-size: 22px; }
       .toast-notification { bottom: 10px; left: 10px; max-width: 280px; padding: 10px 14px; }
@@ -391,8 +402,17 @@
         <span id="live-count">147</span> personas viendo esta página ahora
       </div>
     </div>
-    <div class="scroll-arrow">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+    <div class="scroll-indicator" onclick="window.scrollBy({top:400,behavior:'smooth'})">
+      <span class="scroll-indicator-text">Descubre lo que aprenderás</span>
+      <div class="scroll-arrows-container">
+        <svg class="scroll-chevron" viewBox="0 0 30 16"><path d="M2 2 L15 13 L28 2"/></svg>
+        <svg class="scroll-chevron" viewBox="0 0 30 16"><path d="M2 2 L15 13 L28 2"/></svg>
+        <svg class="scroll-chevron" viewBox="0 0 30 16"><path d="M2 2 L15 13 L28 2"/></svg>
+      </div>
+      <div class="scroll-indicator-line"></div>
+      <div class="scroll-peek">
+        <p class="scroll-peek-text">💰 Aprenderás a captar clientes por redes sociales...</p>
+      </div>
     </div>
   </section>
 
@@ -539,7 +559,7 @@
     // 1. COUNTDOWN TIMER
     // ============================================
     (function() {
-      const eventDate = new Date('2025-03-24T19:00:00+01:00').getTime();
+      const eventDate = new Date('2026-03-24T19:00:00+01:00').getTime();
       const daysEl = document.getElementById('cd-days');
       const hoursEl = document.getElementById('cd-hours');
       const minsEl = document.getElementById('cd-mins');
