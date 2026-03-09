@@ -291,15 +291,30 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 640px) {
-      .hero { padding: 12px 10px 0; }
-      .hero-image-container { max-width: 400px; }
-      .headline-section { padding: 0 14px 10px; }
+      .ticker-wrapper { padding: 7px 0; }
+      .ticker-item { font-size: 11px; padding: 0 28px; }
+      .hero { padding: 8px 10px 0; }
+      .hero-image-container { max-width: 280px; }
+      .headline-section { padding: 0 14px 6px; }
       .headline-section img { max-width: 100%; }
-      .first-cta-section { padding: 4px 14px 14px; }
-      .free-title { font-size: 22px; }
-      .cta-btn { font-size: 15px; padding: 16px 24px; gap: 10px; }
+      .countdown-section { padding: 0 14px 4px; }
+      .countdown-label { font-size: 10px; margin-bottom: 5px; }
+      .countdown-number { font-size: 20px; padding: 5px 8px; min-width: 42px; border-radius: 8px; }
+      .countdown-separator { font-size: 18px; padding-top: 6px; }
+      .countdown-unit-label { font-size: 9px; margin-top: 2px; }
+      .countdown-timer { gap: 6px; }
+      .first-cta-section { padding: 4px 14px 10px; }
+      .urgency-badge { padding: 4px 14px; font-size: 11px; margin-bottom: 6px; }
+      .cta-btn { font-size: 15px; padding: 14px 20px; gap: 10px; }
       .cta-btn .wa-icon { width: 22px; height: 22px; }
-      .cta-dashed-border { padding: 6px; }
+      .cta-dashed-border { padding: 5px; }
+      .live-counter { font-size: 11px; padding: 4px 12px; margin-top: 6px; }
+      .scroll-indicator { padding: 12px 14px 18px; }
+      .scroll-indicator-text { font-size: 11px; letter-spacing: 0.12em; }
+      .scroll-chevron { width: 24px; height: 14px; }
+      .scroll-indicator-line { height: 20px; }
+      .scroll-peek-text { font-size: 13px; }
+      .free-title { font-size: 22px; }
       .speaker-card { flex-direction: column; }
       .speaker-photo { width: 100%; min-width: unset; max-height: 220px; object-fit: cover; object-position: center 20%; }
       .speaker-info { padding: 20px 18px; }
@@ -309,17 +324,35 @@
       .bonus-box { padding: 18px 18px; }
       .bonus-box p { font-size: 15px; }
       .ratings-section { gap: 20px; }
-      .ticker-item { font-size: 11px; padding: 0 28px; }
-      .scroll-indicator-text { font-size: 12px; }
-      .countdown-number { font-size: 24px; padding: 6px 10px; min-width: 48px; }
-      .countdown-separator { font-size: 22px; }
       .toast-notification { bottom: 10px; left: 10px; max-width: 280px; padding: 10px 14px; }
     }
     @media (max-width: 400px) {
-      .cta-btn { font-size: 13px; padding: 14px 18px; }
+      .hero-image-container { max-width: 240px; }
+      .headline-section { padding: 0 10px 4px; }
+      .cta-btn { font-size: 13px; padding: 12px 16px; }
+      .cta-dashed-border { padding: 4px; max-width: 100%; }
       .free-title { font-size: 19px; }
-      .hero-image-container { max-width: 320px; }
-      .countdown-number { font-size: 20px; min-width: 42px; }
+      .countdown-number { font-size: 18px; min-width: 38px; padding: 4px 6px; }
+      .countdown-separator { font-size: 16px; }
+      .urgency-badge { font-size: 10px; padding: 3px 10px; }
+    }
+    /* Extra compact for Instagram in-app browser with very limited viewport */
+    @media (max-height: 700px) and (max-width: 640px) {
+      .ticker-wrapper { padding: 5px 0; }
+      .hero { padding: 4px 10px 0; }
+      .hero-image-container { max-width: 220px; }
+      .headline-section { padding: 0 10px 4px; }
+      .countdown-section { padding: 0 10px 2px; }
+      .countdown-label { font-size: 9px; margin-bottom: 3px; }
+      .countdown-number { font-size: 16px; padding: 3px 6px; min-width: 34px; }
+      .countdown-separator { font-size: 14px; padding-top: 4px; }
+      .countdown-timer { gap: 4px; }
+      .first-cta-section { padding: 2px 10px 8px; }
+      .urgency-badge { padding: 3px 10px; font-size: 9px; margin-bottom: 4px; }
+      .cta-btn { font-size: 13px; padding: 12px 16px; }
+      .cta-dashed-border { padding: 4px; }
+      .live-counter { font-size: 10px; margin-top: 4px; }
+      .scroll-indicator { padding: 8px 10px 12px; }
     }
   </style>
 </head>
