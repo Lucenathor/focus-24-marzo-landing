@@ -52,7 +52,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- ===== META PIXEL (PLACEHOLDER - Reemplaza TU_PIXEL_ID) ===== -->
+  <!-- ===== META PIXEL (ID: 722922776466704) ===== -->
   <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -62,20 +62,10 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    // fbq('init', 'TU_PIXEL_ID');
-    // fbq('track', 'PageView');
+    fbq('init', '722922776466704');
+    fbq('track', 'PageView');
   </script>
-
-  <!-- ===== GOOGLE ANALYTICS 4 (PLACEHOLDER - Reemplaza TU_GA4_ID) ===== -->
-  <!--
-  <script async src="https://www.googletagmanager.com/gtag/js?id=TU_GA4_ID"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'TU_GA4_ID');
-  </script>
-  -->
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=722922776466704&ev=PageView&noscript=1" /></noscript>
 
   <style>
     /* ===== RESET & BASE ===== */
@@ -661,94 +651,191 @@
     document.head.appendChild(rippleStyle);
 
     // ============================================
-    // 6. TRACKING: CTA Click Events
-    // ============================================
-    document.querySelectorAll('.cta-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const position = this.getAttribute('data-track') || 'unknown';
-
-        // Meta Pixel (si está configurado)
-        if (typeof fbq === 'function') {
-          fbq('track', 'Lead', { content_name: 'WhatsApp_CTA_Click', content_category: position });
-        }
-
-        // Google Analytics 4 (si está configurado)
-        if (typeof gtag === 'function') {
-          gtag('event', 'cta_click', {
-            event_category: 'engagement',
-            event_label: position,
-            value: 1
-          });
-        }
-
-        // Console log para debugging
-        console.log('[TRACK] CTA Click:', position, new Date().toISOString());
-      });
-    });
-
-    // ============================================
-    // 7. SCROLL DEPTH TRACKING
+    // 6. FOCUS ANALYTICS - INTERNAL TRACKING SYSTEM
     // ============================================
     (function() {
-      const thresholds = [25, 50, 75, 100];
-      const tracked = {};
-      window.addEventListener('scroll', function() {
-        const scrollPercent = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-        thresholds.forEach(t => {
-          if (scrollPercent >= t && !tracked[t]) {
-            tracked[t] = true;
-            if (typeof gtag === 'function') {
-              gtag('event', 'scroll_depth', { event_label: t + '%', value: t });
-            }
-            if (typeof fbq === 'function') {
-              fbq('trackCustom', 'ScrollDepth', { depth: t });
-            }
-            console.log('[TRACK] Scroll depth:', t + '%');
-          }
-        });
-      });
-    })();
+      // === CONFIGURATION ===
+      const TRACKING_API = (window.FOCUS_TRACKING_API || 'https://focus-analytics.manus.space/api/track');
+      const BATCH_INTERVAL = 5000; // Send events every 5 seconds
+      let eventQueue = [];
 
-    // ============================================
-    // 8. TIME ON PAGE TRACKING
-    // ============================================
-    (function() {
-      const milestones = [15, 30, 60, 120];
-      let elapsed = 0;
-      setInterval(() => {
-        elapsed++;
-        if (milestones.includes(elapsed)) {
-          if (typeof gtag === 'function') {
-            gtag('event', 'time_on_page', { event_label: elapsed + 's', value: elapsed });
-          }
-          console.log('[TRACK] Time on page:', elapsed + 's');
+      // === COOKIE-LESS FINGERPRINTING ===
+      function generateFingerprint() {
+        const components = [
+          navigator.userAgent,
+          navigator.language,
+          screen.width + 'x' + screen.height,
+          screen.colorDepth,
+          new Date().getTimezoneOffset(),
+          navigator.hardwareConcurrency || 'unknown',
+          navigator.maxTouchPoints || 0,
+          navigator.platform || 'unknown',
+          (navigator.plugins ? Array.from(navigator.plugins).map(p => p.name).join(',') : ''),
+          (window.devicePixelRatio || 1),
+          ('ontouchstart' in window) ? 'touch' : 'no-touch',
+          (navigator.connection && navigator.connection.effectiveType) || 'unknown'
+        ];
+        // Simple hash function
+        let hash = 0;
+        const str = components.join('|');
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash; // Convert to 32bit integer
         }
-      }, 1000);
-    })();
+        return 'fp_' + Math.abs(hash).toString(36) + '_' + str.length.toString(36);
+      }
 
-    // ============================================
-    // 9. UTM PARAMETER CAPTURE
-    // ============================================
-    (function() {
+      const FINGERPRINT = generateFingerprint();
+
+      // === DEVICE DETECTION ===
+      function detectDevice() {
+        const ua = navigator.userAgent;
+        if (/iPad|tablet/i.test(ua) && !/mobile/i.test(ua)) return 'tablet';
+        if (/iPhone/i.test(ua)) return 'iphone';
+        if (/Android/i.test(ua) && /mobile/i.test(ua)) return 'android';
+        if (/Android/i.test(ua)) return 'tablet';
+        return 'desktop';
+      }
+
+      function detectBrowser() {
+        const ua = navigator.userAgent;
+        if (ua.includes('Firefox/')) return 'Firefox';
+        if (ua.includes('Edg/')) return 'Edge';
+        if (ua.includes('OPR/') || ua.includes('Opera/')) return 'Opera';
+        if (ua.includes('Chrome/') && !ua.includes('Edg/')) return 'Chrome';
+        if (ua.includes('Safari/') && !ua.includes('Chrome/')) return 'Safari';
+        return 'Other';
+      }
+
+      function detectOS() {
+        const ua = navigator.userAgent;
+        if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+        if (/Android/.test(ua)) return 'Android';
+        if (/Windows/.test(ua)) return 'Windows';
+        if (/Mac OS X/.test(ua)) return 'macOS';
+        if (/Linux/.test(ua)) return 'Linux';
+        return 'Other';
+      }
+
+      // === UTM CAPTURE ===
       const params = new URLSearchParams(window.location.search);
-      const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
       const utmData = {};
-      utmKeys.forEach(key => {
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(key => {
         const val = params.get(key);
         if (val) utmData[key] = val;
       });
       if (Object.keys(utmData).length > 0) {
         sessionStorage.setItem('utm_data', JSON.stringify(utmData));
-        console.log('[TRACK] UTM captured:', utmData);
+      }
+      // Retrieve stored UTMs
+      const storedUtm = sessionStorage.getItem('utm_data');
+      const utms = storedUtm ? JSON.parse(storedUtm) : {};
+
+      // === BASE EVENT DATA ===
+      const baseEvent = {
+        fingerprint: FINGERPRINT,
+        deviceType: detectDevice(),
+        browser: detectBrowser(),
+        os: detectOS(),
+        screenResolution: screen.width + 'x' + screen.height,
+        language: navigator.language,
+        utmSource: utms.utm_source || '',
+        utmMedium: utms.utm_medium || '',
+        utmCampaign: utms.utm_campaign || '',
+        utmTerm: utms.utm_term || '',
+        utmContent: utms.utm_content || '',
+        referrer: document.referrer || '',
+        pageUrl: window.location.href
+      };
+
+      // === QUEUE EVENT ===
+      function queueEvent(eventType, extra) {
+        eventQueue.push({
+          ...baseEvent,
+          eventType: eventType,
+          eventTimestamp: Date.now(),
+          ...extra
+        });
       }
 
-      // Append UTMs to WhatsApp links for downstream tracking
-      const storedUtm = sessionStorage.getItem('utm_data');
-      if (storedUtm) {
-        const utm = JSON.parse(storedUtm);
-        // Store in cookie for cross-session attribution
-        document.cookie = 'utm_data=' + encodeURIComponent(storedUtm) + ';max-age=2592000;path=/';
+      // === SEND BATCH ===
+      function sendBatch() {
+        if (eventQueue.length === 0) return;
+        const batch = eventQueue.splice(0, 50);
+        const payload = JSON.stringify({ events: batch });
+        // Use sendBeacon for reliability (works even on page close)
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          navigator.sendBeacon(TRACKING_API, blob);
+        } else {
+          fetch(TRACKING_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload,
+            keepalive: true
+          }).catch(() => {});
+        }
       }
+
+      // Send batch every 5 seconds
+      setInterval(sendBatch, BATCH_INTERVAL);
+      // Also send on page unload
+      window.addEventListener('beforeunload', sendBatch);
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'hidden') sendBatch();
+      });
+
+      // === TRACK PAGEVIEW ===
+      queueEvent('pageview');
+
+      // === TRACK CTA CLICKS ===
+      document.querySelectorAll('.cta-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const position = this.getAttribute('data-track') || 'unknown';
+          queueEvent('cta_click', { eventValue: position });
+          // Also fire Meta Pixel Lead event
+          if (typeof fbq === 'function') {
+            fbq('track', 'Lead', { content_name: 'WhatsApp_CTA_Click', content_category: position });
+          }
+          // Force send immediately on click
+          sendBatch();
+        });
+      });
+
+      // === TRACK SCROLL DEPTH ===
+      let maxScroll = 0;
+      const scrollThresholds = [25, 50, 75, 100];
+      const scrollTracked = {};
+      window.addEventListener('scroll', function() {
+        const docHeight = document.body.scrollHeight - window.innerHeight;
+        if (docHeight <= 0) return;
+        const scrollPercent = Math.round((window.scrollY / docHeight) * 100);
+        if (scrollPercent > maxScroll) maxScroll = scrollPercent;
+        scrollThresholds.forEach(t => {
+          if (scrollPercent >= t && !scrollTracked[t]) {
+            scrollTracked[t] = true;
+            queueEvent('scroll_depth', { scrollDepth: t, eventValue: t + '%' });
+            if (typeof fbq === 'function') {
+              fbq('trackCustom', 'ScrollDepth', { depth: t });
+            }
+          }
+        });
+      });
+
+      // === TRACK TIME ON PAGE ===
+      let timeOnPage = 0;
+      const timeMilestones = [15, 30, 60, 120, 300];
+      const timeTracked = {};
+      setInterval(() => {
+        timeOnPage++;
+        if (timeMilestones.includes(timeOnPage) && !timeTracked[timeOnPage]) {
+          timeTracked[timeOnPage] = true;
+          queueEvent('time_on_page', { timeOnPage: timeOnPage, eventValue: timeOnPage + 's' });
+        }
+      }, 1000);
+
+      console.log('[Focus Analytics] Tracking initialized. Fingerprint:', FINGERPRINT, 'Device:', baseEvent.deviceType);
     })();
   </script>
 
