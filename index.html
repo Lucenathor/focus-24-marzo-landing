@@ -102,11 +102,12 @@
     }
 
     /* ===== SCROLL REVEAL ===== */
-    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal { opacity: 0; transform: translateY(50px) scale(0.97); transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); will-change: opacity, transform; }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+    .reveal-delay-4 { transition-delay: 0.6s; }
 
     /* ===== TICKER BANNER ===== */
     .ticker-wrapper { position: relative; z-index: 10; background: linear-gradient(90deg, #0a1628 0%, #0d1f3c 50%, #0a1628 100%); overflow: hidden; padding: 10px 0; border-bottom: 1px solid rgba(0, 136, 255, 0.2); }
@@ -564,7 +565,7 @@
     <div class="toast-content">
       <span class="toast-name" id="toast-name">María G.</span>
       <span class="toast-action">se ha unido a la comunidad</span>
-      <span class="toast-time" id="toast-time">hace 2 minutos</span>
+      <span class="toast-time" id="toast-time">hace 1 minuto</span>
     </div>
   </div>
 
@@ -636,7 +637,7 @@
         'Lucía H.', 'Andrés B.', 'Carmen D.', 'Roberto N.', 'Isabel C.',
         'Fernando J.', 'Patricia K.', 'Alejandro W.', 'Marta Z.', 'Diego O.'
       ];
-      const times = ['hace 1 minuto', 'hace 2 minutos', 'hace 3 minutos', 'hace 5 minutos', 'hace 8 minutos', 'hace 12 minutos'];
+      const times = ['hace 30 segundos', 'hace 1 minuto', 'hace 1 minuto', 'hace 2 minutos', 'hace 2 minutos', 'hace 3 minutos', 'hace 4 minutos'];
       const avatars = ['👤', '👩', '👨', '🧑', '👩‍💼', '👨‍💼'];
       const toast = document.getElementById('toast');
       const toastName = document.getElementById('toast-name');
@@ -663,10 +664,19 @@
     // ============================================
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
       });
-    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }, { threshold: 0.08, rootMargin: '0px 0px -20px 0px' });
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+      // Add staggered delay to sections that don't already have a delay class
+      if (!el.classList.contains('reveal-delay-1') && !el.classList.contains('reveal-delay-2') && !el.classList.contains('reveal-delay-3')) {
+        el.style.transitionDelay = '0s';
+      }
+      observer.observe(el);
+    });
 
     // ============================================
     // 5. RIPPLE EFFECT
